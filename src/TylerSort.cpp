@@ -236,6 +236,7 @@ int main(int argc, char* argv[])
                                      { return !std::isnan(e); });
                 cb_abM->Fill(mult, det);
             }
+            processedEntries++;
         }
     };
 
@@ -245,7 +246,11 @@ int main(int argc, char* argv[])
     EventProcessor.Process(fillHistograms);
     timer.Stop();
 
-    printf("[INFO] Processed events in %.2f seconds\n", timer.RealTime());
+    progressBarThread.join();
+
+    printf("[INFO] Processed events in %.2f seconds (%.2f events/second)\n",
+           timer.RealTime(),
+           static_cast<double>(processedEntries) / timer.RealTime());
 
     // Save the histograms to a new ROOT file
     TFile* outfile = new TFile("out.root", "RECREATE");

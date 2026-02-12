@@ -144,18 +144,6 @@ int main(int argc, char* argv[])
         auto cc_trt_ptr = cc_trt.Get();
         auto cc_mdt_ptr = cc_mdt.Get();
 
-        // Validate TTreeReaderArray setup - read first entry to initialize
-        if (!event_reader.Next())
-            return; // Empty range, nothing to process
-
-        // Check setup status after first Next() call
-        if (cc_amp_val.GetSetupStatus() < 0 || cc_cht_val.GetSetupStatus() < 0 ||
-            cc_mdt_val.GetSetupStatus() < 0 || cc_plu_val.GetSetupStatus() < 0 ||
-            cc_trt_val.GetSetupStatus() < 0)
-        {
-            printf("[ERROR] TTreeReaderArray setup failed\n");
-            return;
-        }
         // auto cc_xtE_ptr = cc_xtE.Get();
         // auto cc_sum_ptr = cc_sum.Get();
         // auto cc_abE_ptr = cc_abE.Get();
@@ -177,6 +165,16 @@ int main(int argc, char* argv[])
         // Loop over the entries in the tree
         while (event_reader.Next())
         {
+            if (cc_amp_val.GetSize() != kDigitizerChannels ||
+                cc_cht_val.GetSize() != kDigitizerChannels ||
+                cc_mdt_val.GetSize() != 1 ||
+                cc_plu_val.GetSize() != kDigitizerChannels ||
+                cc_trt_val.GetSize() != 2)
+            {
+                throw std::runtime_error(Form("[ERROR] Unexpected array size in event %llu: expected %zu, got %zu (amplitude), %zu (channel_time), %zu (module_timestamp), %zu (pileup), %zu (trigger_time)",
+                                              event_reader.GetCurrentEntry(), kDigitizerChannels, cc_amp_val.GetSize(), cc_cht_val.GetSize(), cc_mdt_val.GetSize(), cc_plu_val.GetSize(), cc_trt_val.GetSize()));
+            }
+
             cc_mdt_ptr->Fill(cc_mdt_val[0] * kNsPerBin);
             cc_trt_ptr->Fill(cc_trt_val[0] * kNsPerBin, 0);
             cc_trt_ptr->Fill(cc_trt_val[1] * kNsPerBin, 1);

@@ -143,6 +143,19 @@ int main(int argc, char* argv[])
         auto cc_plu_ptr = cc_plu.Get();
         auto cc_trt_ptr = cc_trt.Get();
         auto cc_mdt_ptr = cc_mdt.Get();
+
+        // Validate TTreeReaderArray setup - read first entry to initialize
+        if (!event_reader.Next())
+            return; // Empty range, nothing to process
+
+        // Check setup status after first Next() call
+        if (cc_amp_val.GetSetupStatus() < 0 || cc_cht_val.GetSetupStatus() < 0 ||
+            cc_mdt_val.GetSetupStatus() < 0 || cc_plu_val.GetSetupStatus() < 0 ||
+            cc_trt_val.GetSetupStatus() < 0)
+        {
+            printf("[ERROR] TTreeReaderArray setup failed\n");
+            return;
+        }
         // auto cc_xtE_ptr = cc_xtE.Get();
         // auto cc_sum_ptr = cc_sum.Get();
         // auto cc_abE_ptr = cc_abE.Get();

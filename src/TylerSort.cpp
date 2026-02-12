@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
     infile->Close();
 
     // Atomic counter for processed entries
-    std::atomic<uint64_t> processedEntries(0);
+    // std::atomic<uint64_t> processedEntries(0);
 
     // Start the progress bar in a separate thread
     // std::thread progressBarThread(CAUtilities::DisplayProgressBar, std::ref(processedEntries), n_entries);
@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
                 //                      { return !std::isnan(e); });
                 // cb_abM_ptr->Fill(mult, det);
             }
-            processedEntries++;
+            // processedEntries++;
         }
     };
 
@@ -256,9 +256,9 @@ int main(int argc, char* argv[])
 
     // progressBarThread.join();
 
-    printf("[INFO] Processed events in %.2f seconds (%.2f events/second)\n",
-           timer.RealTime(),
-           static_cast<double>(processedEntries) / timer.RealTime());
+    // printf("[INFO] Processed events in %.2f seconds (%.2f events/second)\n",
+    //        timer.RealTime(),
+    //        static_cast<double>(processedEntries) / timer.RealTime());
 
     // Save the histograms to a new ROOT file
     TFile* outfile = new TFile("out.root", "RECREATE");

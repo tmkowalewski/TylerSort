@@ -49,40 +49,40 @@ int main(int argc, char* argv[])
     auto cc_mdt = ROOT::TThreadedObject<TH1D>("cc_mdt", "Clover Cross Module Time;Time (ns);Counts/Bin", kDigitizerBins, 0, kDigitizerBins * kNsPerBin);
     auto cc_trt = ROOT::TThreadedObject<TH2D>("cc_trt", "Clover Cross Trigger Time;Time (ns);Trigger ID;Counts/Bin", kDigitizerBins, 0, kDigitizerBins * kNsPerBin, 2, 0, 2);
 
-    // Calibrated Hists
-    auto cc_xtE = ROOT::TThreadedObject<TH2D>("cc_xtE", "Clover Cross Energy;Energy (keV);Channel;Counts/Bin", kMaxEnergy / kEnergyPerBin, 0, kMaxEnergy, kDigitizerChannels, 0, kDigitizerChannels);
+    // // Calibrated Hists
+    // auto cc_xtE = ROOT::TThreadedObject<TH2D>("cc_xtE", "Clover Cross Energy;Energy (keV);Channel;Counts/Bin", kMaxEnergy / kEnergyPerBin, 0, kMaxEnergy, kDigitizerChannels, 0, kDigitizerChannels);
 
-    // Sum Hists
-    auto cc_sum = ROOT::TThreadedObject<TH2D>("cc_sum", "Clover Cross Energy (Detector Sum);Energy (keV);Detector;Counts/Bin", kMaxEnergy / kEnergyPerBin, 0, kMaxEnergy, kDigitizerChannels / 4, 0, kDigitizerChannels / 4);
+    // // Sum Hists
+    // auto cc_sum = ROOT::TThreadedObject<TH2D>("cc_sum", "Clover Cross Energy (Detector Sum);Energy (keV);Detector;Counts/Bin", kMaxEnergy / kEnergyPerBin, 0, kMaxEnergy, kDigitizerChannels / 4, 0, kDigitizerChannels / 4);
 
-    // Addback Hists
-    auto cc_abE = ROOT::TThreadedObject<TH2D>("cc_abE", "Clover Cross Energy (Detector Addback);Energy (keV);Detector;Counts/Bin", kMaxEnergy / kEnergyPerBin, 0, kMaxEnergy, kDigitizerChannels / 4, 0, kDigitizerChannels / 4);
-    auto cc_abM = ROOT::TThreadedObject<TH2D>("cc_abM", "Clover Cross Addback Multiplicity;Multiplicity;Counts/Bin", 4, 1, 5, kDigitizerChannels / 4, 0, kDigitizerChannels / 4);
+    // // Addback Hists
+    // auto cc_abE = ROOT::TThreadedObject<TH2D>("cc_abE", "Clover Cross Energy (Detector Addback);Energy (keV);Detector;Counts/Bin", kMaxEnergy / kEnergyPerBin, 0, kMaxEnergy, kDigitizerChannels / 4, 0, kDigitizerChannels / 4);
+    // auto cc_abM = ROOT::TThreadedObject<TH2D>("cc_abM", "Clover Cross Addback Multiplicity;Multiplicity;Counts/Bin", 4, 1, 5, kDigitizerChannels / 4, 0, kDigitizerChannels / 4);
 
-    std::array<ROOT::TThreadedObject<TH2D>, 6> c1_xtk = {
-        ROOT::TThreadedObject<TH2D>("C1_xtk_E1E2", "C1 Cross-Talk E1 by E2;E1;E2", kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy, kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy),
-        ROOT::TThreadedObject<TH2D>("C1_xtk_E1E3", "C1 Cross-Talk E1 by E3;E1;E3", kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy, kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy),
-        ROOT::TThreadedObject<TH2D>("C1_xtk_E1E4", "C1 Cross-Talk E1 by E4;E1;E4", kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy, kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy),
-        ROOT::TThreadedObject<TH2D>("C1_xtk_E2E3", "C1 Cross-Talk E2 by E3;E2;E3", kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy, kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy),
-        ROOT::TThreadedObject<TH2D>("C1_xtk_E2E4", "C1 Cross-Talk E2 by E4;E2;E4", kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy, kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy),
-        ROOT::TThreadedObject<TH2D>("C1_xtk_E3E4", "C1 Cross-Talk E3 by E4;E3;E4", kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy, kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy)};
+    // std::array<ROOT::TThreadedObject<TH2D>, 6> c1_xtk = {
+    //     ROOT::TThreadedObject<TH2D>("C1_xtk_E1E2", "C1 Cross-Talk E1 by E2;E1;E2", kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy, kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy),
+    //     ROOT::TThreadedObject<TH2D>("C1_xtk_E1E3", "C1 Cross-Talk E1 by E3;E1;E3", kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy, kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy),
+    //     ROOT::TThreadedObject<TH2D>("C1_xtk_E1E4", "C1 Cross-Talk E1 by E4;E1;E4", kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy, kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy),
+    //     ROOT::TThreadedObject<TH2D>("C1_xtk_E2E3", "C1 Cross-Talk E2 by E3;E2;E3", kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy, kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy),
+    //     ROOT::TThreadedObject<TH2D>("C1_xtk_E2E4", "C1 Cross-Talk E2 by E4;E2;E4", kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy, kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy),
+    //     ROOT::TThreadedObject<TH2D>("C1_xtk_E3E4", "C1 Cross-Talk E3 by E4;E3;E4", kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy, kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy)};
 
-    // Raw Hists
-    auto cb_amp = ROOT::TThreadedObject<TH2D>("cb_amp", "Clover Back Amplitude (Raw Data);ADC;Channel;Counts/Bin", kDigitizerBins, 0, kDigitizerBins, kDigitizerChannels, 0, kDigitizerChannels);
-    auto cb_cht = ROOT::TThreadedObject<TH2D>("cb_cht", "Clover Back Channel Time (Raw Data);ADC;Channel;Counts/Bin", kDigitizerBins, 0, (kDigitizerBins)*kNsPerBin, kDigitizerChannels, 0, kDigitizerChannels);
-    auto cb_plu = ROOT::TThreadedObject<TH2D>("cb_plu", "Clover Back Pile-Up;Pile-Up Multiplicity;Channel;Counts/Bin", kDigitizerBins, 0, kDigitizerBins, kDigitizerChannels, 0, kDigitizerChannels);
-    auto cb_mdt = ROOT::TThreadedObject<TH1D>("cb_mdt", "Clover Back Module Time;Time (ns);Counts/Bin", kDigitizerBins, 0, (kDigitizerBins)*kNsPerBin);
-    auto cb_trt = ROOT::TThreadedObject<TH2D>("cb_trt", "Clover Back Trigger Time;Time (ns);Trigger ID;Counts/Bin", kDigitizerBins, 0, (kDigitizerBins)*kNsPerBin, 2, 0, 2);
+    // // Raw Hists
+    // auto cb_amp = ROOT::TThreadedObject<TH2D>("cb_amp", "Clover Back Amplitude (Raw Data);ADC;Channel;Counts/Bin", kDigitizerBins, 0, kDigitizerBins, kDigitizerChannels, 0, kDigitizerChannels);
+    // auto cb_cht = ROOT::TThreadedObject<TH2D>("cb_cht", "Clover Back Channel Time (Raw Data);ADC;Channel;Counts/Bin", kDigitizerBins, 0, (kDigitizerBins)*kNsPerBin, kDigitizerChannels, 0, kDigitizerChannels);
+    // auto cb_plu = ROOT::TThreadedObject<TH2D>("cb_plu", "Clover Back Pile-Up;Pile-Up Multiplicity;Channel;Counts/Bin", kDigitizerBins, 0, kDigitizerBins, kDigitizerChannels, 0, kDigitizerChannels);
+    // auto cb_mdt = ROOT::TThreadedObject<TH1D>("cb_mdt", "Clover Back Module Time;Time (ns);Counts/Bin", kDigitizerBins, 0, (kDigitizerBins)*kNsPerBin);
+    // auto cb_trt = ROOT::TThreadedObject<TH2D>("cb_trt", "Clover Back Trigger Time;Time (ns);Trigger ID;Counts/Bin", kDigitizerBins, 0, (kDigitizerBins)*kNsPerBin, 2, 0, 2);
 
-    // Calibrated Hists
-    auto cb_xtE = ROOT::TThreadedObject<TH2D>("cb_xtE", "Clover Back Energy;Energy (keV);Channel;Counts/Bin", kMaxEnergy / kEnergyPerBin, 0, kMaxEnergy, kDigitizerChannels, 0, kDigitizerChannels);
+    // // Calibrated Hists
+    // auto cb_xtE = ROOT::TThreadedObject<TH2D>("cb_xtE", "Clover Back Energy;Energy (keV);Channel;Counts/Bin", kMaxEnergy / kEnergyPerBin, 0, kMaxEnergy, kDigitizerChannels, 0, kDigitizerChannels);
 
-    // Sum Hists
-    auto cb_sum = ROOT::TThreadedObject<TH2D>("cb_sum", "Clover Back Energy (Detector Sum);Energy (keV);Detector;Counts/Bin", kMaxEnergy / kEnergyPerBin, 0, kMaxEnergy, kDigitizerChannels / 4, 0, kDigitizerChannels / 4);
+    // // Sum Hists
+    // auto cb_sum = ROOT::TThreadedObject<TH2D>("cb_sum", "Clover Back Energy (Detector Sum);Energy (keV);Detector;Counts/Bin", kMaxEnergy / kEnergyPerBin, 0, kMaxEnergy, kDigitizerChannels / 4, 0, kDigitizerChannels / 4);
 
-    // Addback Hists
-    auto cb_abE = ROOT::TThreadedObject<TH2D>("cb_abE", "Clover Back Energy (Detector Addback);Energy (keV);Detector;Counts/Bin", kMaxEnergy / kEnergyPerBin, 0, kMaxEnergy, kDigitizerChannels / 4, 0, kDigitizerChannels / 4);
-    auto cb_abM = ROOT::TThreadedObject<TH2D>("cb_abM", "Clover Back Addback Multiplicity;Multiplicity;Counts/Bin", 4, 1, 5, kDigitizerChannels / 4, 0, kDigitizerChannels / 4);
+    // // Addback Hists
+    // auto cb_abE = ROOT::TThreadedObject<TH2D>("cb_abE", "Clover Back Energy (Detector Addback);Energy (keV);Detector;Counts/Bin", kMaxEnergy / kEnergyPerBin, 0, kMaxEnergy, kDigitizerChannels / 4, 0, kDigitizerChannels / 4);
+    // auto cb_abM = ROOT::TThreadedObject<TH2D>("cb_abM", "Clover Back Addback Multiplicity;Multiplicity;Counts/Bin", 4, 1, 5, kDigitizerChannels / 4, 0, kDigitizerChannels / 4);
 
     // Parse command line arguments
 
@@ -131,21 +131,21 @@ int main(int argc, char* argv[])
         TTreeReaderArray<double> cc_plu_val(event_reader, "clover_cross.pileup");
         TTreeReaderArray<double> cc_trt_val(event_reader, "clover_cross.trigger_time");
 
-        TTreeReaderArray<double> cb_amp_val(event_reader, "clover_back.amplitude");
-        TTreeReaderArray<double> cb_cht_val(event_reader, "clover_back.channel_time");
-        TTreeReaderArray<double> cb_mdt_val(event_reader, "clover_back.module_timestamp");
-        TTreeReaderArray<double> cb_plu_val(event_reader, "clover_back.pileup");
-        TTreeReaderArray<double> cb_trt_val(event_reader, "clover_back.trigger_time");
+        // TTreeReaderArray<double> cb_amp_val(event_reader, "clover_back.amplitude");
+        // TTreeReaderArray<double> cb_cht_val(event_reader, "clover_back.channel_time");
+        // TTreeReaderArray<double> cb_mdt_val(event_reader, "clover_back.module_timestamp");
+        // TTreeReaderArray<double> cb_plu_val(event_reader, "clover_back.pileup");
+        // TTreeReaderArray<double> cb_trt_val(event_reader, "clover_back.trigger_time");
 
         auto cc_amp_ptr = cc_amp.Get();
         auto cc_cht_ptr = cc_cht.Get();
         auto cc_plu_ptr = cc_plu.Get();
         auto cc_trt_ptr = cc_trt.Get();
         auto cc_mdt_ptr = cc_mdt.Get();
-        auto cc_xtE_ptr = cc_xtE.Get();
-        auto cc_sum_ptr = cc_sum.Get();
-        auto cc_abE_ptr = cc_abE.Get();
-        auto cc_abM_ptr = cc_abM.Get();
+        // auto cc_xtE_ptr = cc_xtE.Get();
+        // auto cc_sum_ptr = cc_sum.Get();
+        // auto cc_abE_ptr = cc_abE.Get();
+        // auto cc_abM_ptr = cc_abM.Get();
         // std::array<std::shared_ptr<TH2D>, 6> c1_xtk_ptrs;
         // for (size_t i = 0; i < c1_xtk_ptrs.size(); ++i)
         //     c1_xtk_ptrs[i] = c1_xtk[i].Get();
@@ -173,8 +173,8 @@ int main(int argc, char* argv[])
 
             for (size_t det = 0; det < 4; det++)
             {
-                std::array<double, 4> cc_xtal_E = {NAN, NAN, NAN, NAN}, cb_xtal_E = {NAN, NAN, NAN, NAN};
-                std::array<double, 4> cc_xtal_T = {NAN, NAN, NAN, NAN}, cb_xtal_T = {NAN, NAN, NAN, NAN};
+                // std::array<double, 4> cc_xtal_E = {NAN, NAN, NAN, NAN}, cb_xtal_E = {NAN, NAN, NAN, NAN};
+                // std::array<double, 4> cc_xtal_T = {NAN, NAN, NAN, NAN}, cb_xtal_T = {NAN, NAN, NAN, NAN};
 
                 // Crystal Loop
                 for (size_t xtal = 0; xtal < 4; xtal++)

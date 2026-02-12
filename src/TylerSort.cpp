@@ -24,8 +24,8 @@
 #include <TTreeReaderArray.h>
 
 // Project Includes
-#include "CASort/CAAddBack.hpp"
-#include "CASort/CACrosstalkCorrection.hpp"
+// #include "CASort/CAAddBack.hpp"
+// #include "CASort/CACrosstalkCorrection.hpp"
 #include "CASort/CAUtilities.hpp"
 
 /* #endregion Includes */
@@ -115,7 +115,6 @@ int main(int argc, char* argv[])
     std::thread progressBarThread(CAUtilities::DisplayProgressBar, std::ref(processedEntries), n_entries);
 
     ROOT::EnableImplicitMT(kThreads);
-    ROOT::EnableThreadSafety();
 
     printf("[INFO] Processing events with %d threads...\n", kThreads);
 

@@ -276,14 +276,11 @@ int main(int argc, char* argv[])
         auto cc_sum = CAHistograms::cc_sum.GetThreadLocalPtr();
         auto cc_abE = CAHistograms::cc_abE.GetThreadLocalPtr();
         auto cc_abM = CAHistograms::cc_abM.GetThreadLocalPtr();
-        auto c1_xtk = std::array<std::shared_ptr<TH2D>, 6>{
-            CAHistograms::c1_xtk[0].GetThreadLocalPtr(),
-            CAHistograms::c1_xtk[1].GetThreadLocalPtr(),
-            CAHistograms::c1_xtk[2].GetThreadLocalPtr(),
-            CAHistograms::c1_xtk[3].GetThreadLocalPtr(),
-            CAHistograms::c1_xtk[4].GetThreadLocalPtr(),
-            CAHistograms::c1_xtk[5].GetThreadLocalPtr(),
-        };
+        std::array<std::shared_ptr<TH2D>, 6> c1_xtk;
+        for (size_t i = 0; i < 6; ++i)
+        {
+            c1_xtk[i] = CAHistograms::c1_xtk[i].GetThreadLocalPtr();
+        }
 #endif // PROCESS_CLOVER_CROSS
 
 #if PROCESS_CLOVER_BACK
@@ -314,22 +311,30 @@ int main(int argc, char* argv[])
 
 // Module Time
 #if PROCESS_CLOVER_CROSS
-            cc_mdt->Fill(cc_mdt_val[0] * CAHistograms::kNsPerBin);
+            if (cc_mdt_val.GetSize() > 0)
+                cc_mdt->Fill(cc_mdt_val[0] * CAHistograms::kNsPerBin);
 #endif // PROCESS_CLOVER_CROSS
 
 #if PROCESS_CLOVER_BACK
-            cb_mdt->Fill(cb_mdt_val[0] * CAHistograms::kNsPerBin);
+            if (cb_mdt_val.GetSize() > 0)
+                cb_mdt->Fill(cb_mdt_val[0] * CAHistograms::kNsPerBin);
 #endif // PROCESS_CLOVER_BACK
 
 // Trigger Times
 #if PROCESS_CLOVER_CROSS
-            cc_trt->Fill(cc_trt_val[0] * CAHistograms::kNsPerBin, 0);
-            cc_trt->Fill(cc_trt_val[1] * CAHistograms::kNsPerBin, 1);
+            if (cc_trt_val.GetSize() > 1)
+            {
+                cc_trt->Fill(cc_trt_val[0] * CAHistograms::kNsPerBin, 0);
+                cc_trt->Fill(cc_trt_val[1] * CAHistograms::kNsPerBin, 1);
+            }
 #endif // PROCESS_CLOVER_CROSS
 
 #if PROCESS_CLOVER_BACK
-            cb_trt->Fill(cb_trt_val[0] * CAHistograms::kNsPerBin, 0);
-            cb_trt->Fill(cb_trt_val[1] * CAHistograms::kNsPerBin, 1);
+            if (cb_trt_val.GetSize() > 1)
+            {
+                cb_trt->Fill(cb_trt_val[0] * CAHistograms::kNsPerBin, 0);
+                cb_trt->Fill(cb_trt_val[1] * CAHistograms::kNsPerBin, 1);
+            }
 #endif // PROCESS_CLOVER_BACK
 
             // Main Loop
@@ -347,20 +352,29 @@ int main(int argc, char* argv[])
 
                     // Raw Histograms
 #if PROCESS_CLOVER_CROSS
-                    cc_amp->Fill(cc_amp_val[ch], ch);
-                    cc_cht->Fill(cc_cht_val[ch], ch);
-                    cc_plu->Fill(cc_plu_val[ch], ch);
+                    // Bounds check to prevent memory corruption
+                    if (ch < cc_amp_val.GetSize())
+                    {
+                        cc_amp->Fill(cc_amp_val[ch], ch);
+                        cc_cht->Fill(cc_cht_val[ch], ch);
+                        cc_plu->Fill(cc_plu_val[ch], ch);
+                    }
 #endif // PROCESS_CLOVER_CROSS
 
 #if PROCESS_CLOVER_BACK
-                    cb_amp->Fill(cb_amp_val[ch], ch);
-                    cb_cht->Fill(cb_cht_val[ch], ch);
-                    cb_plu->Fill(cb_plu_val[ch], ch);
+                    // Bounds check to prevent memory corruption
+                    if (ch < cb_amp_val.GetSize())
+                    {
+                        cb_amp->Fill(cb_amp_val[ch], ch);
+                        cb_cht->Fill(cb_cht_val[ch], ch);
+                        cb_plu->Fill(cb_plu_val[ch], ch);
+                    }
 #endif // PROCESS_CLOVER_BACK
 
 // Calibrated Histograms
 #if PROCESS_CLOVER_CROSS
-                    if (!std::isnan(cc_amp_val[ch]) &&
+                    if (ch < cc_amp_val.GetSize() &&
+                        !std::isnan(cc_amp_val[ch]) &&
                         !std::isnan(cc_cht_val[ch]))
                     {
                         // std::cout << "Channel: " << ch << ", ";
@@ -375,7 +389,8 @@ int main(int argc, char* argv[])
 #endif // PROCESS_CLOVER_CROSS
 
 #if PROCESS_CLOVER_BACK
-                    if (!std::isnan(cb_amp_val[ch]) &&
+                    if (ch < cb_amp_val.GetSize() &&
+                        !std::isnan(cb_amp_val[ch]) &&
                         !std::isnan(cb_cht_val[ch]))
                     {
                         // std::cout << "Channel: " << ch << ", ";

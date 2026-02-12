@@ -30,8 +30,9 @@ int main(int argc, char* argv[])
 {
 
     constexpr size_t kDigitizerChannels = 16;
-    constexpr size_t kDigitizerBins = 2 << 16; // 16-bit digitizer
-    constexpr double kNsPerBin = 0.098;        // 62.5 ps per bin for 16-bit digitizer at 1 GHz sampling rate
+    constexpr size_t kDigitizerBins = 2 << 16;
+    constexpr double kNsPerBin = 0.098;
+    const unsigned int kThreads = std::thread::hardware_concurrency();
 
     auto cc_amp = ROOT::TThreadedObject<TH2D>("cc_amp", "Clover Cross Amplitude (Raw Data);ADC;Channel;Counts/Bin", kDigitizerBins, 0, kDigitizerBins, kDigitizerChannels, 0, kDigitizerChannels);
     auto cc_cht = ROOT::TThreadedObject<TH2D>("cc_cht", "Clover Cross Channel Time (Raw Data);ADC;Channel;Counts/Bin", kDigitizerBins, 0, kDigitizerBins * kNsPerBin, kDigitizerChannels, 0, kDigitizerChannels);
@@ -39,7 +40,10 @@ int main(int argc, char* argv[])
     auto cc_mdt = ROOT::TThreadedObject<TH1D>("cc_mdt", "Clover Cross Module Time;Time (ns);Counts/Bin", kDigitizerBins, 0, kDigitizerBins * kNsPerBin);
     auto cc_trt = ROOT::TThreadedObject<TH2D>("cc_trt", "Clover Cross Trigger Time;Time (ns);Trigger ID;Counts/Bin", kDigitizerBins, 0, kDigitizerBins * kNsPerBin, 2, 0, 2);
 
-    printf("[INFO] Processing events...\n");
+    ROOT::EnableImplicitMT(kThreads);
+    ROOT::EnableThreadSafety();
+
+    printf("[INFO] Processing events with %d threads...\n", kThreads);
 
     // Create a TTreeReader to read the TTree
     ROOT::TTreeProcessorMT EventProcessor(argv[1], "clover");

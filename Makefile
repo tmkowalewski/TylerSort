@@ -9,7 +9,7 @@ BIN_DIR  := bin
 CXX       := g++
 CXXFLAGS  := `root-config --cflags` -I~/.local/include -fPIC
 LDFLAGS   := `root-config --libs` -L~/.local/lib -lCASort -Wl,-rpath,~/.local/lib
-DEBUGFLAGS := -g -O0
+DEBUGFLAGS := -g -O0 -fsanitize=thread
 
 # Target executable name
 TARGET := $(BIN_DIR)/TylerSort

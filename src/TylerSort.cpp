@@ -315,28 +315,28 @@ int main(int argc, char* argv[])
 // Module Time
 #if PROCESS_CLOVER_CROSS
             if (cc_mdt_val.GetSize() > 0)
-                cc_mdt->Fill(cc_mdt_val[0] * CAHistograms::kNsPerBin);
+                cc_mdt->Fill(cc_mdt_val.At(0) * CAHistograms::kNsPerBin);
 #endif // PROCESS_CLOVER_CROSS
 
 #if PROCESS_CLOVER_BACK
             if (cb_mdt_val.GetSize() > 0)
-                cb_mdt->Fill(cb_mdt_val[0] * CAHistograms::kNsPerBin);
+                cb_mdt->Fill(cb_mdt_val.At(0) * CAHistograms::kNsPerBin);
 #endif // PROCESS_CLOVER_BACK
 
 // Trigger Times
 #if PROCESS_CLOVER_CROSS
             if (cc_trt_val.GetSize() > 1)
             {
-                cc_trt->Fill(cc_trt_val[0] * CAHistograms::kNsPerBin, 0);
-                cc_trt->Fill(cc_trt_val[1] * CAHistograms::kNsPerBin, 1);
+                cc_trt->Fill(cc_trt_val.At(0) * CAHistograms::kNsPerBin, 0);
+                cc_trt->Fill(cc_trt_val.At(1) * CAHistograms::kNsPerBin, 1);
             }
 #endif // PROCESS_CLOVER_CROSS
 
 #if PROCESS_CLOVER_BACK
             if (cb_trt_val.GetSize() > 1)
             {
-                cb_trt->Fill(cb_trt_val[0] * CAHistograms::kNsPerBin, 0);
-                cb_trt->Fill(cb_trt_val[1] * CAHistograms::kNsPerBin, 1);
+                cb_trt->Fill(cb_trt_val.At(0) * CAHistograms::kNsPerBin, 0);
+                cb_trt->Fill(cb_trt_val.At(1) * CAHistograms::kNsPerBin, 1);
             }
 #endif // PROCESS_CLOVER_BACK
 

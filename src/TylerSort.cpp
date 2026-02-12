@@ -43,6 +43,10 @@ int main(int argc, char* argv[])
     constexpr double kXTalkEnergyPerBin = 1;
     constexpr double kXTalkMaxEnergy = 6000;
 
+    // Enable implicit multithreading BEFORE creating TThreadedObject instances
+    ROOT::EnableImplicitMT(kThreads);
+    printf("[INFO] Enabled implicit MT with %d threads\n", kThreads);
+
     auto cc_amp = ROOT::TThreadedObject<TH2D>("cc_amp", "Clover Cross Amplitude (Raw Data);ADC;Channel;Counts/Bin", kDigitizerBins, 0, kDigitizerBins, kDigitizerChannels, 0, kDigitizerChannels);
     auto cc_cht = ROOT::TThreadedObject<TH2D>("cc_cht", "Clover Cross Channel Time (Raw Data);ADC;Channel;Counts/Bin", kDigitizerBins, 0, kDigitizerBins * kNsPerBin, kDigitizerChannels, 0, kDigitizerChannels);
     auto cc_plu = ROOT::TThreadedObject<TH2D>("cc_plu", "Clover Cross Pile-Up;Pile-Up Multiplicity;Channel;Counts/Bin", kDigitizerBins, 0, kDigitizerBins, kDigitizerChannels, 0, kDigitizerChannels);
@@ -113,8 +117,6 @@ int main(int argc, char* argv[])
 
     // Start the progress bar in a separate thread
     std::thread progressBarThread(CAUtilities::DisplayProgressBar, std::ref(processedEntries), n_entries);
-
-    ROOT::EnableImplicitMT(kThreads);
 
     printf("[INFO] Processing events with %d threads...\n", kThreads);
 

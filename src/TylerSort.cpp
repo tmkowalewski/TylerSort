@@ -96,14 +96,14 @@
 #define L3 11
 #define MPAD 12
 
-static const std::map<std::string, int> cross_channel_map = {
-    {"C1E1", C1E1}, {"C1E2", C1E2}, {"C1E3", C1E3}, {"C1E4", C1E4}, {"C3E1", C3E1}, {"C3E2", C3E2}, {"C3E3", C3E3}, {"C3E4", C3E4}, {"C5E1", C5E1}, {"C5E2", C5E2}, {"C5E3", C5E3}, {"C5E4", C5E4}, {"C7E1", C7E1}, {"C7E2", C7E2}, {"C7E3", C7E3}, {"C7E4", C7E4}};
-static const std::map<std::string, int> back_channel_map = {
-    {"B1E1", B1E1}, {"B1E2", B1E2}, {"B1E3", B1E3}, {"B1E4", B1E4}, {"B2E1", B2E1}, {"B2E2", B2E2}, {"B2E3", B2E3}, {"B2E4", B2E4}, {"B3E1", B3E1}, {"B3E2", B3E2}, {"B3E3", B3E3}, {"B3E4", B3E4}, {"B5E1", B5E1}, {"B5E2", B5E2}, {"B5E3", B5E3}, {"B5E4", B5E4}};
-static const std::map<std::string, int> possig_channel_map = {
-    {"ZDEG", ZDEG}, {"SB4E1", SB4E1}, {"B4E1", B4E1}, {"B4E2", B4E2}, {"B4E3", B4E3}, {"B4E4", B4E4}};
-static const std::map<std::string, int> cebr_channel_map = {
-    {"cB", cB}, {"cC", cC}, {"cD", cD}, {"cF", cF}, {"cG", cG}, {"cH", cH}, {"cK", cK}, {"cO", cO}, {"cBJ", cBJ}, {"cBK", cBK}, {"cBL", cBL}, {"L3", L3}, {"MPAD", MPAD}};
+// static const std::map<std::string, int> cross_channel_map = {
+//     {"C1E1", C1E1}, {"C1E2", C1E2}, {"C1E3", C1E3}, {"C1E4", C1E4}, {"C3E1", C3E1}, {"C3E2", C3E2}, {"C3E3", C3E3}, {"C3E4", C3E4}, {"C5E1", C5E1}, {"C5E2", C5E2}, {"C5E3", C5E3}, {"C5E4", C5E4}, {"C7E1", C7E1}, {"C7E2", C7E2}, {"C7E3", C7E3}, {"C7E4", C7E4}};
+// static const std::map<std::string, int> back_channel_map = {
+//     {"B1E1", B1E1}, {"B1E2", B1E2}, {"B1E3", B1E3}, {"B1E4", B1E4}, {"B2E1", B2E1}, {"B2E2", B2E2}, {"B2E3", B2E3}, {"B2E4", B2E4}, {"B3E1", B3E1}, {"B3E2", B3E2}, {"B3E3", B3E3}, {"B3E4", B3E4}, {"B5E1", B5E1}, {"B5E2", B5E2}, {"B5E3", B5E3}, {"B5E4", B5E4}};
+// static const std::map<std::string, int> possig_channel_map = {
+//     {"ZDEG", ZDEG}, {"SB4E1", SB4E1}, {"B4E1", B4E1}, {"B4E2", B4E2}, {"B4E3", B4E3}, {"B4E4", B4E4}};
+// static const std::map<std::string, int> cebr_channel_map = {
+//     {"cB", cB}, {"cC", cC}, {"cD", cD}, {"cF", cF}, {"cG", cG}, {"cH", cH}, {"cK", cK}, {"cO", cO}, {"cBJ", cBJ}, {"cBK", cBK}, {"cBL", cBL}, {"L3", L3}, {"MPAD", MPAD}};
 
 /* #endregion DAQ Channel Key*/
 
@@ -272,18 +272,18 @@ int main(int argc, char* argv[])
         auto cc_plu = CAHistograms::cc_plu.GetThreadLocalPtr();
         auto cc_trt = CAHistograms::cc_trt.GetThreadLocalPtr();
         auto cc_mdt = CAHistograms::cc_mdt.GetThreadLocalPtr();
-        auto cc_xtE = CAHistograms::cc_xtE.GetThreadLocalPtr();
-        auto cc_sum = CAHistograms::cc_sum.GetThreadLocalPtr();
-        auto cc_abE = CAHistograms::cc_abE.GetThreadLocalPtr();
-        auto cc_abM = CAHistograms::cc_abM.GetThreadLocalPtr();
-        auto c1_xtk = std::array<std::shared_ptr<TH2D>, 6>{
-            CAHistograms::c1_xtk[0].GetThreadLocalPtr(),
-            CAHistograms::c1_xtk[1].GetThreadLocalPtr(),
-            CAHistograms::c1_xtk[2].GetThreadLocalPtr(),
-            CAHistograms::c1_xtk[3].GetThreadLocalPtr(),
-            CAHistograms::c1_xtk[4].GetThreadLocalPtr(),
-            CAHistograms::c1_xtk[5].GetThreadLocalPtr(),
-        };
+        // auto cc_xtE = CAHistograms::cc_xtE.GetThreadLocalPtr();
+        // auto cc_sum = CAHistograms::cc_sum.GetThreadLocalPtr();
+        // auto cc_abE = CAHistograms::cc_abE.GetThreadLocalPtr();
+        // auto cc_abM = CAHistograms::cc_abM.GetThreadLocalPtr();
+        // auto c1_xtk = std::array<std::shared_ptr<TH2D>, 6>{
+        //     CAHistograms::c1_xtk[0].GetThreadLocalPtr(),
+        //     CAHistograms::c1_xtk[1].GetThreadLocalPtr(),
+        //     CAHistograms::c1_xtk[2].GetThreadLocalPtr(),
+        //     CAHistograms::c1_xtk[3].GetThreadLocalPtr(),
+        //     CAHistograms::c1_xtk[4].GetThreadLocalPtr(),
+        //     CAHistograms::c1_xtk[5].GetThreadLocalPtr(),
+        // };
 #endif // PROCESS_CLOVER_CROSS
 
 #if PROCESS_CLOVER_BACK
@@ -376,19 +376,19 @@ int main(int argc, char* argv[])
 
 // Calibrated Histograms
 #if PROCESS_CLOVER_CROSS
-                    if (ch < cc_amp_val.GetSize() &&
-                        !std::isnan(cc_amp_val[ch]) &&
-                        !std::isnan(cc_cht_val[ch]))
-                    {
-                        // std::cout << "Channel: " << ch << ", ";
-                        double energy = cc_E_cal[ch](cc_E_gmp[ch](cc_amp_val[ch])); // Gain-match, then calibrate
-                        double cht = cc_cht_val[ch] * CAHistograms::kNsPerBin;
-                        cc_xtE->Fill(energy, ch);
-                        cc_cht->Fill(cht, ch);
-                        cc_sum->Fill(energy, det); // ch / 4 is the detector number
-                        cc_xtal_E[xtal] = energy;
-                        cc_xtal_T[xtal] = cht;
-                    }
+                    // if (ch < cc_amp_val.GetSize() &&
+                    //     !std::isnan(cc_amp_val[ch]) &&
+                    //     !std::isnan(cc_cht_val[ch]))
+                    // {
+                    //     // std::cout << "Channel: " << ch << ", ";
+                    //     double energy = cc_E_cal[ch](cc_E_gmp[ch](cc_amp_val[ch])); // Gain-match, then calibrate
+                    //     double cht = cc_cht_val[ch] * CAHistograms::kNsPerBin;
+                    //     cc_xtE->Fill(energy, ch);
+                    //     cc_cht->Fill(cht, ch);
+                    //     cc_sum->Fill(energy, det); // ch / 4 is the detector number
+                    //     cc_xtal_E[xtal] = energy;
+                    //     cc_xtal_T[xtal] = cht;
+                    // }
 #endif // PROCESS_CLOVER_CROSS
 
 #if PROCESS_CLOVER_BACK
@@ -410,14 +410,14 @@ int main(int argc, char* argv[])
 
 // Add-Back Histograms
 #if PROCESS_CLOVER_CROSS
-                cc_abE->Fill(CAAddBack::GetAddBackEnergy(cc_xtal_E, cc_xtal_T), det);
-                unsigned int mult = std::count_if(cc_xtal_E.begin(), cc_xtal_E.end(), [](double e)
-                                                  { return !std::isnan(e); });
-                cc_abM->Fill(mult, det);
-                if (mult == 2 && det == 0)
-                {
-                    CACrosstalkCorrection::FillXTalkHistograms(c1_xtk, cc_xtal_E, cc_xtal_T);
-                }
+                // cc_abE->Fill(CAAddBack::GetAddBackEnergy(cc_xtal_E, cc_xtal_T), det);
+                // unsigned int mult = std::count_if(cc_xtal_E.begin(), cc_xtal_E.end(), [](double e)
+                //                                   { return !std::isnan(e); });
+                // cc_abM->Fill(mult, det);
+                // if (mult == 2 && det == 0)
+                // {
+                //     CACrosstalkCorrection::FillXTalkHistograms(c1_xtk, cc_xtal_E, cc_xtal_T);
+                // }
 #endif // PROCESS_CLOVER_CROSS
 
 #if PROCESS_CLOVER_BACK
@@ -472,14 +472,14 @@ int main(int argc, char* argv[])
     CAHistograms::cc_plu.Write();
     CAHistograms::cc_trt.Write();
     CAHistograms::cc_mdt.Write();
-    CAHistograms::cc_xtE.Write();
-    CAHistograms::cc_sum.Write();
-    CAHistograms::cc_abE.Write();
-    CAHistograms::cc_abM.Write();
-    for (int i = 0; i < 6; i++)
-    {
-        CAHistograms::c1_xtk[i].Write();
-    }
+    // CAHistograms::cc_xtE.Write();
+    // CAHistograms::cc_sum.Write();
+    // CAHistograms::cc_abE.Write();
+    // CAHistograms::cc_abM.Write();
+    // for (int i = 0; i < 6; i++)
+    // {
+    //     CAHistograms::c1_xtk[i].Write();
+    // }
     outfile->cd();
 #endif // PROCESS_CLOVER_CROSS
 

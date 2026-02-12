@@ -10,6 +10,7 @@ CXX       := g++
 CXXFLAGS  := `root-config --cflags` -I~/.local/include -fPIC
 LDFLAGS   := `root-config --libs` -L~/.local/lib -lCASort -Wl,-rpath,~/.local/lib
 DEBUGFLAGS := -g -O0 -fsanitize=thread
+DEBUGLDFLAGS := -fsanitize=thread
 
 # Target executable name
 TARGET := $(BIN_DIR)/TylerSort
@@ -23,6 +24,7 @@ all: $(TARGET)
 
 # Debug target
 debug: CXXFLAGS += $(DEBUGFLAGS)
+debug: LDFLAGS += $(DEBUGLDFLAGS)
 debug: clean all
 
 # Link object files into the executable

@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     constexpr double kXTalkMaxEnergy = 6000;
 
     // Enable implicit multithreading BEFORE creating TThreadedObject instances
-    ROOT::EnableImplicitMT(kThreads);
+    // ROOT::EnableImplicitMT(kThreads);
     printf("[INFO] Enabled implicit MT with %d threads\n", kThreads);
 
     auto cc_amp = ROOT::TThreadedObject<TH2D>("cc_amp", "Clover Cross Amplitude (Raw Data);ADC;Channel;Counts/Bin", kDigitizerBins, 0, kDigitizerBins, kDigitizerChannels, 0, kDigitizerChannels);
@@ -113,10 +113,10 @@ int main(int argc, char* argv[])
     infile->Close();
 
     // Atomic counter for processed entries
-    // std::atomic<uint64_t> processedEntries(0);
+    std::atomic<uint64_t> processedEntries(0);
 
     // Start the progress bar in a separate thread
-    // std::thread progressBarThread(CAUtilities::DisplayProgressBar, std::ref(processedEntries), n_entries);
+    std::thread progressBarThread(CAUtilities::DisplayProgressBar, std::ref(processedEntries), n_entries);
 
     printf("[INFO] Processing events with %d threads...\n", kThreads);
 
@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
                 //                      { return !std::isnan(e); });
                 // cb_abM_ptr->Fill(mult, det);
             }
-            // processedEntries++;
+            processedEntries++;
         }
     };
 
@@ -254,11 +254,11 @@ int main(int argc, char* argv[])
     EventProcessor.Process(fillHistograms);
     timer.Stop();
 
-    // progressBarThread.join();
+    progressBarThread.join();
 
-    // printf("[INFO] Processed events in %.2f seconds (%.2f events/second)\n",
-    //        timer.RealTime(),
-    //        static_cast<double>(processedEntries) / timer.RealTime());
+    printf("[INFO] Processed events in %.2f seconds (%.2f events/second)\n",
+           timer.RealTime(),
+           static_cast<double>(processedEntries) / timer.RealTime());
 
     // Save the histograms to a new ROOT file
     TFile* outfile = new TFile("out.root", "RECREATE");

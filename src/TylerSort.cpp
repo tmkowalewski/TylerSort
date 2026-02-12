@@ -221,20 +221,20 @@ int main(int argc, char* argv[])
                     }
                 }
 
-                // Add-Back Histograms
-                cc_abE->Fill(CAAddBack::GetAddBackEnergy(cc_xtal_E, cc_xtal_T), det);
-                unsigned int mult = std::count_if(cc_xtal_E.begin(), cc_xtal_E.end(), [](double e)
-                                                  { return !std::isnan(e); });
-                cc_abM->Fill(mult, det);
-                if (mult == 2 && det == 0)
-                {
-                    CACrosstalkCorrection::FillXTalkHistograms(c1_xtk_ptrs, cc_xtal_E, cc_xtal_T);
-                }
+                // // Add-Back Histograms
+                // cc_abE->Fill(CAAddBack::GetAddBackEnergy(cc_xtal_E, cc_xtal_T), det);
+                // unsigned int mult = std::count_if(cc_xtal_E.begin(), cc_xtal_E.end(), [](double e)
+                //                                   { return !std::isnan(e); });
+                // cc_abM->Fill(mult, det);
+                // if (mult == 2 && det == 0)
+                // {
+                //     CACrosstalkCorrection::FillXTalkHistograms(c1_xtk_ptrs, cc_xtal_E, cc_xtal_T);
+                // }
 
-                cb_abE->Fill(CAAddBack::GetAddBackEnergy(cb_xtal_E, cb_xtal_T), det);
-                mult = std::count_if(cb_xtal_E.begin(), cb_xtal_E.end(), [](double e)
-                                     { return !std::isnan(e); });
-                cb_abM->Fill(mult, det);
+                // cb_abE->Fill(CAAddBack::GetAddBackEnergy(cb_xtal_E, cb_xtal_T), det);
+                // mult = std::count_if(cb_xtal_E.begin(), cb_xtal_E.end(), [](double e)
+                //                      { return !std::isnan(e); });
+                // cb_abM->Fill(mult, det);
             }
             processedEntries++;
         }

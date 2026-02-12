@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
 {
 
     constexpr size_t kDigitizerChannels = 16;
-    constexpr size_t kDigitizerBins = 2 << 16;
+    constexpr size_t kDigitizerBins = 1 << 16; // 65536 bins for 16-bit ADC
     constexpr double kNsPerBin = 0.098;
     const unsigned int kThreads = std::thread::hardware_concurrency();
     constexpr double kEnergyPerBin = 0.25;

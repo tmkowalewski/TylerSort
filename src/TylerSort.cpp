@@ -276,11 +276,14 @@ int main(int argc, char* argv[])
         auto cc_sum = CAHistograms::cc_sum.GetThreadLocalPtr();
         auto cc_abE = CAHistograms::cc_abE.GetThreadLocalPtr();
         auto cc_abM = CAHistograms::cc_abM.GetThreadLocalPtr();
-        std::array<std::shared_ptr<TH2D>, 6> c1_xtk;
-        for (size_t i = 0; i < 6; ++i)
-        {
-            c1_xtk[i] = CAHistograms::c1_xtk[i].GetThreadLocalPtr();
-        }
+        auto c1_xtk = std::array<std::shared_ptr<TH2D>, 6>{
+            CAHistograms::c1_xtk[0].GetThreadLocalPtr(),
+            CAHistograms::c1_xtk[1].GetThreadLocalPtr(),
+            CAHistograms::c1_xtk[2].GetThreadLocalPtr(),
+            CAHistograms::c1_xtk[3].GetThreadLocalPtr(),
+            CAHistograms::c1_xtk[4].GetThreadLocalPtr(),
+            CAHistograms::c1_xtk[5].GetThreadLocalPtr(),
+        };
 #endif // PROCESS_CLOVER_CROSS
 
 #if PROCESS_CLOVER_BACK

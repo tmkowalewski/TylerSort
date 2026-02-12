@@ -26,6 +26,7 @@
 // Project Includes
 #include "CASort/CAAddBack.hpp"
 #include "CASort/CACrosstalkCorrection.hpp"
+#include "CASort/CAUtilities.hpp"
 
 /* #endregion Includes */
 
@@ -82,6 +83,36 @@ int main(int argc, char* argv[])
     // Addback Hists
     auto cb_abE = ROOT::TThreadedObject<TH2D>("cb_abE", "Clover Back Energy (Detector Addback);Energy (keV);Detector;Counts/Bin", kMaxEnergy / kEnergyPerBin, 0, kMaxEnergy, kDigitizerChannels / 4, 0, kDigitizerChannels / 4);
     auto cb_abM = ROOT::TThreadedObject<TH2D>("cb_abM", "Clover Back Addback Multiplicity;Multiplicity;Counts/Bin", 4, 1, 5, kDigitizerChannels / 4, 0, kDigitizerChannels / 4);
+
+    // Parse command line arguments
+
+    auto infile = TFile::Open(argv[1], "READ");
+    if (!infile || infile->IsZombie())
+    {
+        throw std::runtime_error(Form("[ERROR] Error opening input file: %s", argv[1]));
+    }
+    printf("[INFO] Opened file %s\n", argv[1]);
+
+    // Peak at the TTree to get the number of events
+    TTree* tree;
+    infile->GetObject("clover", tree);
+    if (!tree)
+    {
+        throw std::runtime_error("[ERROR] Error opening TTree");
+    }
+
+    ULong64_t n_entries = tree->GetEntries();
+
+    printf("[INFO] Opened TTree \"clover\" and counted %llu events\n", n_entries);
+
+    delete tree;
+    infile->Close();
+
+    // Atomic counter for processed entries
+    std::atomic<uint64_t> processedEntries(0);
+
+    // Start the progress bar in a separate thread
+    std::thread progressBarThread(CAUtilities::DisplayProgressBar, std::ref(processedEntries), n_entries);
 
     ROOT::EnableImplicitMT(kThreads);
     ROOT::EnableThreadSafety();

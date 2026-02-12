@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
     std::atomic<uint64_t> processedEntries(0);
 
     // Start the progress bar in a separate thread
-    std::thread progressBarThread(CAUtilities::DisplayProgressBar, std::ref(processedEntries), n_entries);
+    // std::thread progressBarThread(CAUtilities::DisplayProgressBar, std::ref(processedEntries), n_entries);
 
     printf("[INFO] Processing events with %d threads...\n", kThreads);
 
@@ -254,7 +254,7 @@ int main(int argc, char* argv[])
     EventProcessor.Process(fillHistograms);
     timer.Stop();
 
-    progressBarThread.join();
+    // progressBarThread.join();
 
     printf("[INFO] Processed events in %.2f seconds (%.2f events/second)\n",
            timer.RealTime(),

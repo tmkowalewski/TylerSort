@@ -146,34 +146,30 @@ int main(int argc, char* argv[])
         auto cc_sum_ptr = cc_sum.Get();
         auto cc_abE_ptr = cc_abE.Get();
         auto cc_abM_ptr = cc_abM.Get();
-        auto c1_xtk_ptrs = std::array<std::shared_ptr<TH2D>, 6>{
-            c1_xtk[0].Get(),
-            c1_xtk[1].Get(),
-            c1_xtk[2].Get(),
-            c1_xtk[3].Get(),
-            c1_xtk[4].Get(),
-            c1_xtk[5].Get(),
-        };
+        // std::array<std::shared_ptr<TH2D>, 6> c1_xtk_ptrs;
+        // for (size_t i = 0; i < c1_xtk_ptrs.size(); ++i)
+        //     c1_xtk_ptrs[i] = c1_xtk[i].Get();
 
-        auto cb_amp_ptr = cb_amp.Get();
-        auto cb_cht_ptr = cb_cht.Get();
-        auto cb_plu_ptr = cb_plu.Get();
-        auto cb_trt_ptr = cb_trt.Get();
-        auto cb_mdt_ptr = cb_mdt.Get();
-        auto cb_xtE_ptr = cb_xtE.Get();
-        auto cb_sum_ptr = cb_sum.Get();
-        auto cb_abE_ptr = cb_abE.Get();
-        auto cb_abM_ptr = cb_abM.Get();
+        // auto cb_amp_ptr = cb_amp.Get();
+        // auto cb_cht_ptr = cb_cht.Get();
+        // auto cb_plu_ptr = cb_plu.Get();
+        // auto cb_trt_ptr = cb_trt.Get();
+        // auto cb_mdt_ptr = cb_mdt.Get();
+        // auto cb_xtE_ptr = cb_xtE.Get();
+        // auto cb_sum_ptr = cb_sum.Get();
+        // auto cb_abE_ptr = cb_abE.Get();
+        // auto cb_abM_ptr = cb_abM.Get();
 
         // Loop over the entries in the tree
         while (event_reader.Next())
         {
-            cc_mdt->Fill(cc_mdt_val[0] * kNsPerBin);
-            cb_mdt->Fill(cb_mdt_val[0] * kNsPerBin);
-            cc_trt->Fill(cc_trt_val[0] * kNsPerBin, 0);
-            cc_trt->Fill(cc_trt_val[1] * kNsPerBin, 1);
-            cb_trt->Fill(cb_trt_val[0] * kNsPerBin, 0);
-            cb_trt->Fill(cb_trt_val[1] * kNsPerBin, 1);
+            cc_mdt_ptr->Fill(cc_mdt_val[0] * kNsPerBin);
+            cc_trt_ptr->Fill(cc_trt_val[0] * kNsPerBin, 0);
+            cc_trt_ptr->Fill(cc_trt_val[1] * kNsPerBin, 1);
+
+            // cb_mdt_ptr->Fill(cb_mdt_val[0] * kNsPerBin);
+            // cb_trt_ptr->Fill(cb_trt_val[0] * kNsPerBin, 0);
+            // cb_trt_ptr->Fill(cb_trt_val[1] * kNsPerBin, 1);
 
             for (size_t det = 0; det < 4; det++)
             {
@@ -186,55 +182,55 @@ int main(int argc, char* argv[])
                     auto ch = det * 4 + xtal; // Channel number 0-15
 
                     // Raw Histograms
-                    cc_amp->Fill(cc_amp_val[ch], ch);
-                    cc_cht->Fill(cc_cht_val[ch], ch);
-                    cc_plu->Fill(cc_plu_val[ch], ch);
-                    cb_amp->Fill(cb_amp_val[ch], ch);
-                    cb_cht->Fill(cb_cht_val[ch], ch);
-                    cb_plu->Fill(cb_plu_val[ch], ch);
+                    cc_amp_ptr->Fill(cc_amp_val[ch], ch);
+                    cc_cht_ptr->Fill(cc_cht_val[ch], ch);
+                    cc_plu_ptr->Fill(cc_plu_val[ch], ch);
+                    // cb_amp_ptr->Fill(cb_amp_val[ch], ch);
+                    // cb_cht_ptr->Fill(cb_cht_val[ch], ch);
+                    // cb_plu_ptr->Fill(cb_plu_val[ch], ch);
 
-                    // Calibrated Histograms
-                    if (!std::isnan(cc_amp_val[ch]) &&
-                        !std::isnan(cc_cht_val[ch]))
-                    {
-                        // std::cout << "Channel: " << ch << ", ";
-                        double energy = cc_amp_val[ch] * 0.16; // Gain-match, then calibrate
-                        double cht = cc_cht_val[ch] * kNsPerBin;
-                        cc_xtE->Fill(energy, ch);
-                        cc_cht->Fill(cht, ch);
-                        cc_sum->Fill(energy, det); // ch / 4 is the detector number
-                        cc_xtal_E[xtal] = energy;
-                        cc_xtal_T[xtal] = cht;
-                    }
+                    // // Calibrated Histograms
+                    // if (!std::isnan(cc_amp_val[ch]) &&
+                    //     !std::isnan(cc_cht_val[ch]))
+                    // {
+                    //     // std::cout << "Channel: " << ch << ", ";
+                    //     double energy = cc_amp_val[ch] * 0.16; // Gain-match, then calibrate
+                    //     double cht = cc_cht_val[ch] * kNsPerBin;
+                    //     cc_xtE_ptr->Fill(energy, ch);
+                    //     cc_cht_ptr->Fill(cht, ch);
+                    //     cc_sum_ptr->Fill(energy, det); // ch / 4 is the detector number
+                    //     cc_xtal_E[xtal] = energy;
+                    //     cc_xtal_T[xtal] = cht;
+                    // }
 
-                    if (!std::isnan(cb_amp_val[ch]) &&
-                        !std::isnan(cb_cht_val[ch]))
-                    {
-                        // std::cout << "Channel: " << ch << ", ";
-                        double energy = cb_amp_val[ch] * 0.16; // Gain-match, then calibrate
-                        double cht = cb_cht_val[ch] * kNsPerBin;
-                        cb_xtE->Fill(energy, ch);
-                        cb_cht->Fill(cht, ch);
-                        cb_sum->Fill(energy, det); // ch / 4 is the detector number
-                        cb_xtal_E[xtal] = energy;
-                        cb_xtal_T[xtal] = cht;
-                    }
+                    // if (!std::isnan(cb_amp_val[ch]) &&
+                    //     !std::isnan(cb_cht_val[ch]))
+                    // {
+                    //     // std::cout << "Channel: " << ch << ", ";
+                    //     double energy = cb_amp_val[ch] * 0.16; // Gain-match, then calibrate
+                    //     double cht = cb_cht_val[ch] * kNsPerBin;
+                    //     cb_xtE_ptr->Fill(energy, ch);
+                    //     cb_cht_ptr->Fill(cht, ch);
+                    //     cb_sum_ptr->Fill(energy, det); // ch / 4 is the detector number
+                    //     cb_xtal_E[xtal] = energy;
+                    //     cb_xtal_T[xtal] = cht;
+                    // }
                 }
 
                 // // Add-Back Histograms
-                // cc_abE->Fill(CAAddBack::GetAddBackEnergy(cc_xtal_E, cc_xtal_T), det);
+                // cc_abE_ptr->Fill(CAAddBack::GetAddBackEnergy(cc_xtal_E, cc_xtal_T), det);
                 // unsigned int mult = std::count_if(cc_xtal_E.begin(), cc_xtal_E.end(), [](double e)
                 //                                   { return !std::isnan(e); });
-                // cc_abM->Fill(mult, det);
+                // cc_abM_ptr->Fill(mult, det);
                 // if (mult == 2 && det == 0)
                 // {
                 //     CACrosstalkCorrection::FillXTalkHistograms(c1_xtk_ptrs, cc_xtal_E, cc_xtal_T);
                 // }
 
-                // cb_abE->Fill(CAAddBack::GetAddBackEnergy(cb_xtal_E, cb_xtal_T), det);
+                // cb_abE_ptr->Fill(CAAddBack::GetAddBackEnergy(cb_xtal_E, cb_xtal_T), det);
                 // mult = std::count_if(cb_xtal_E.begin(), cb_xtal_E.end(), [](double e)
                 //                      { return !std::isnan(e); });
-                // cb_abM->Fill(mult, det);
+                // cb_abM_ptr->Fill(mult, det);
             }
             processedEntries++;
         }

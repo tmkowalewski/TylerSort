@@ -60,8 +60,8 @@ int main(int argc, char* argv[])
     /* #region Calibration Setup */
 
     // Declare calibration variables (populated only for cal/xtcorr modes)
-    std::vector<std::function<double(double)>> ccGainMatch, cbGainMatch, psGainMatch, ceGainMatch;
-    std::vector<std::function<double(double)>> ccECalibrate, cbECalibrate, psECalibrate, ceECalibrate;
+    std::vector<std::function<double(double)>>                               ccGainMatch, cbGainMatch, psGainMatch, ceGainMatch;
+    std::vector<std::function<double(double)>>                               ccECalibrate, cbECalibrate, psECalibrate, ceECalibrate;
     std::vector<std::function<std::array<double, 4>(std::array<double, 4>)>> xTalkCorrection;
 
     if (args.mode == "cal" || args.mode == "xtcorr")
@@ -76,8 +76,7 @@ int main(int argc, char* argv[])
         } catch (const std::exception& e)
         {
             printf("[WARN] Crosstalk correction functions not found, proceeding without crosstalk correction\n");
-            xTalkCorrection = std::vector<std::function<std::array<double, 4>(std::array<double, 4>)>>(
-                4, [](std::array<double, 4> x) { return x; });
+            xTalkCorrection = std::vector<std::function<std::array<double, 4>(std::array<double, 4>)>>(4, [](std::array<double, 4> x) { return x; });
         }
 
         // Calibration functions
@@ -123,10 +122,7 @@ int main(int argc, char* argv[])
     /* #region Event Loop Setup*/
 
     auto inputFile = TFile::Open(args.runFileName.c_str());
-    if (!inputFile || inputFile->IsZombie())
-    {
-        throw std::runtime_error(Form("[ERROR] Error opening input file: %s", args.runFileName.c_str()));
-    }
+    if (!inputFile || inputFile->IsZombie()) { throw std::runtime_error(Form("[ERROR] Error opening input file: %s", args.runFileName.c_str())); }
     printf("[INFO] Opened file %s\n", args.runFileName.c_str());
 
     // Find the first TTree in the file, regardless of name
@@ -233,21 +229,21 @@ int main(int argc, char* argv[])
             // Clover Cross
             cc_amp = Histograms::cc_amp->GetThreadLocalPtr();
             cc_cht = Histograms::cc_cht->GetThreadLocalPtr();
-            cc_plu = Histograms::cc_plu->GetThreadLocalPtr();
-            cc_mdt = Histograms::cc_mdt->GetThreadLocalPtr();
-            cc_trt = Histograms::cc_trt->GetThreadLocalPtr();
-            // Clover Back
+            // cc_plu = Histograms::cc_plu->GetThreadLocalPtr();
+            // cc_mdt = Histograms::cc_mdt->GetThreadLocalPtr();
+            // cc_trt = Histograms::cc_trt->GetThreadLocalPtr();
+            //  Clover Back
             cb_amp = Histograms::cb_amp->GetThreadLocalPtr();
             cb_cht = Histograms::cb_cht->GetThreadLocalPtr();
-            cb_plu = Histograms::cb_plu->GetThreadLocalPtr();
-            cb_mdt = Histograms::cb_mdt->GetThreadLocalPtr();
-            cb_trt = Histograms::cb_trt->GetThreadLocalPtr();
-            // CeBr Detectors
+            // cb_plu = Histograms::cb_plu->GetThreadLocalPtr();
+            // cb_mdt = Histograms::cb_mdt->GetThreadLocalPtr();
+            // cb_trt = Histograms::cb_trt->GetThreadLocalPtr();
+            //  CeBr Detectors
             ce_inl = Histograms::ce_inl->GetThreadLocalPtr();
-            ce_ins = Histograms::ce_ins->GetThreadLocalPtr();
+            // ce_ins = Histograms::ce_ins->GetThreadLocalPtr();
             ce_cht = Histograms::ce_cht->GetThreadLocalPtr();
-            ce_mdt = Histograms::ce_mdt->GetThreadLocalPtr();
-            ce_trt = Histograms::ce_trt->GetThreadLocalPtr();
+            // ce_mdt = Histograms::ce_mdt->GetThreadLocalPtr();
+            //  ce_trt = Histograms::ce_trt->GetThreadLocalPtr();
         }
         if (isCal)
         {
@@ -318,7 +314,7 @@ int main(int argc, char* argv[])
                         // cb_plu->Fill(cb_plu_val[ch], ch);
                         //  CeBr Detectors
                         ce_inl->Fill(ce_inL_val[ch], ch);
-                        ce_ins->Fill(ce_ins_val[ch], ch);
+                        // ce_ins->Fill(ce_ins_val[ch], ch);
                         ce_cht->Fill(ce_cht_val[ch] * Histograms::kNsPerBin, ch);
                     }
 
@@ -344,35 +340,31 @@ int main(int argc, char* argv[])
                 } // End Crystal Loop
 
                 // Clover Cross Add-Back
-                if (isCal && std::any_of(cc_xtal_E.begin(), cc_xtal_E.end(),
-                                         [](double x) { return x > CAAddBack::kAddBackThreshold; }))
+                if (isCal && std::any_of(cc_xtal_E.begin(), cc_xtal_E.end(), [](double x) { return x > CAAddBack::kAddBackThreshold; }))
                 {
                     if (isXtcorr)
                     {
-                        unsigned int cc_mult =
-                            std::count_if(cc_xtal_E.begin(), cc_xtal_E.end(), [](double x) { return !std::isnan(x); });
+                        unsigned int cc_mult = std::count_if(cc_xtal_E.begin(), cc_xtal_E.end(), [](double x) { return !std::isnan(x); });
                         cc_abM->Fill(cc_mult, det);
                         if (cc_mult == 2) CACrosstalkCorrection::FillXTalkHistograms(cc_xtk[det], cc_xtal_E, cc_xtal_T);
                     }
-                    auto energies_corr  = xTalkCorrection[4 + det](cc_xtal_E);
-                    auto energy_ab_corr = CAAddBack::GetAddBackEnergy(energies_corr, cc_xtal_T);
-                    cc_abE->Fill(energy_ab_corr, det);
+                    auto energies_corr = xTalkCorrection[4 + det](cc_xtal_E);
+                    auto ab_hit        = CAAddBack::GetAddBackHit(energies_corr, cc_xtal_T);
+                    cc_abE->Fill(ab_hit.first, det);
                 }
 
                 // Clover Back Add-Back
-                if (isCal && std::any_of(cb_xtal_E.begin(), cb_xtal_E.end(),
-                                         [](double x) { return x > CAAddBack::kAddBackThreshold; }))
+                if (isCal && std::any_of(cb_xtal_E.begin(), cb_xtal_E.end(), [](double x) { return x > CAAddBack::kAddBackThreshold; }))
                 {
                     if (isXtcorr)
                     {
-                        unsigned int cb_mult =
-                            std::count_if(cb_xtal_E.begin(), cb_xtal_E.end(), [](double x) { return !std::isnan(x); });
+                        unsigned int cb_mult = std::count_if(cb_xtal_E.begin(), cb_xtal_E.end(), [](double x) { return !std::isnan(x); });
                         cb_abM->Fill(cb_mult, det);
                         if (cb_mult == 2) CACrosstalkCorrection::FillXTalkHistograms(cb_xtk[det], cb_xtal_E, cb_xtal_T);
                     }
-                    auto energies_corr  = xTalkCorrection[det](cb_xtal_E);
-                    auto energy_ab_corr = CAAddBack::GetAddBackEnergy(energies_corr, cb_xtal_T);
-                    cb_abE->Fill(energy_ab_corr, det);
+                    auto energies_corr = xTalkCorrection[det](cb_xtal_E);
+                    auto ab_hit        = CAAddBack::GetAddBackHit(energies_corr, cb_xtal_T);
+                    cb_abE->Fill(ab_hit.first, det);
                 }
 
             } // End Detector Loop
@@ -389,15 +381,11 @@ int main(int argc, char* argv[])
 
     progressBarThread.join();
 
-    printf("[INFO] Processed events in %.2f seconds (%.2f events/second)\n", timer.RealTime(),
-           static_cast<double>(processedEntries) / timer.RealTime());
+    printf("[INFO] Processed events in %.2f seconds (%.2f events/second)\n", timer.RealTime(), static_cast<double>(processedEntries) / timer.RealTime());
 
     // Save the histograms to a new ROOT file
     TFile* outfile = new TFile(args.outputFileName.c_str(), "RECREATE");
-    if (!outfile || outfile->IsZombie())
-    {
-        throw std::runtime_error(Form("[ERROR] Error creating output file: %s", args.outputFileName.c_str()));
-    }
+    if (!outfile || outfile->IsZombie()) { throw std::runtime_error(Form("[ERROR] Error creating output file: %s", args.outputFileName.c_str())); }
 
     /* #region Write Histograms */
 
@@ -408,8 +396,8 @@ int main(int argc, char* argv[])
     {
         Histograms::cc_amp->Write();
         Histograms::cc_cht->Write();
-        Histograms::cc_plu->Write();
-        Histograms::cc_trt->Write();
+        // Histograms::cc_plu->Write();
+        // Histograms::cc_trt->Write();
         Histograms::cc_mdt->Write();
     }
     if (args.mode == "cal" || args.mode == "xtcorr")
@@ -438,8 +426,8 @@ int main(int argc, char* argv[])
     {
         Histograms::cb_amp->Write();
         Histograms::cb_cht->Write();
-        Histograms::cb_plu->Write();
-        Histograms::cb_trt->Write();
+        // Histograms::cb_plu->Write();
+        // Histograms::cb_trt->Write();
         Histograms::cb_mdt->Write();
     }
     if (args.mode == "cal" || args.mode == "xtcorr")
@@ -469,7 +457,7 @@ int main(int argc, char* argv[])
         Histograms::ce_inl->Write();
         Histograms::ce_ins->Write();
         Histograms::ce_cht->Write();
-        Histograms::ce_trt->Write();
+        // Histograms::ce_trt->Write();
         Histograms::ce_mdt->Write();
     }
     if (args.mode == "cal" || args.mode == "xtcorr") { Histograms::ce_chE->Write(); }

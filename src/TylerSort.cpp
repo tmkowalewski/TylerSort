@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
     std::vector<std::function<double(double)>>                               ccECalibrate, cbECalibrate, psECalibrate, ceECalibrate;
     std::vector<std::function<std::array<double, 4>(std::array<double, 4>)>> xTalkCorrection;
 
-    if (args.mode == "cal" || args.mode == "xtcorr")
+    if (args.mode == "cal" || args.mode == "xtcorr" || args.mode == "coin")
     {
         auto funcsGainMatch = CAGainCorrection::MakeCorrections(args.gainShiftFile);
 
@@ -202,9 +202,11 @@ int main(int argc, char* argv[])
 
         /* #region Get Histogram pointers*/
 
-        const bool isRaw    = (args.mode == "raw");
-        const bool isCal    = (args.mode == "cal" || args.mode == "xtcorr");
-        const bool isXtcorr = (args.mode == "xtcorr");
+        const bool isRaw            = (args.mode == "raw");
+        const bool isCal            = (args.mode == "cal" || args.mode == "xtcorr");
+        const bool isXtcorr         = (args.mode == "xtcorr");
+        const bool isCoin           = (args.mode == "coin");
+        const bool needsCalibration = (isCal || isCoin); // coin mode needs calibrated energies to populate hpgeHits
 
         // Clover Cross thread-local histogram pointers
         std::shared_ptr<TH2D>                cc_amp, cc_cht, cc_plu, cc_trt;
@@ -223,6 +225,10 @@ int main(int argc, char* argv[])
         // CeBr thread-local histogram pointers
         std::shared_ptr<TH2D> ce_inl, ce_ins, ce_cht, ce_trt;
         std::shared_ptr<TH1D> ce_mdt;
+
+        // Coincidence thread-local histogram pointers
+        std::shared_ptr<TH3I> gege_ggT;
+        std::shared_ptr<TH1I> gege_ggM;
 
         if (isRaw)
         {
@@ -267,6 +273,11 @@ int main(int argc, char* argv[])
             for (int i = 0; i < 6; i++) b3_xtk[i] = Histograms::b3_xtk[i]->GetThreadLocalPtr();
             for (int i = 0; i < 6; i++) b5_xtk[i] = Histograms::b5_xtk[i]->GetThreadLocalPtr();
         }
+        if (isCoin)
+        {
+            gege_ggT = Histograms::gege_ggT->GetThreadLocalPtr();
+            gege_ggM = Histograms::gege_ggM->GetThreadLocalPtr();
+        }
 
         std::array<std::array<std::shared_ptr<TH2D>, 6>, 4> cc_xtk = {c1_xtk, c3_xtk, c5_xtk, c7_xtk};
         std::array<std::array<std::shared_ptr<TH2D>, 6>, 4> cb_xtk = {b1_xtk, b2_xtk, b3_xtk, b5_xtk};
@@ -290,6 +301,9 @@ int main(int argc, char* argv[])
                 // ce_trt->Fill(ce_trt_val[0] * Histograms::kNsPerBin, 0);
                 // ce_trt->Fill(ce_trt_val[1] * Histograms::kNsPerBin, 1);
             }
+
+            std::vector<std::pair<double, double>> hpgeHits; // Vector to store HPGe hits for coincidence analysis
+            // std::vector<std::pair<double, double>> cebrHits;   // Vector to store CeBr hits for coincidence analysis
 
             // Detector Loop
             for (size_t det = 0; det < 4; det++)
@@ -318,29 +332,35 @@ int main(int argc, char* argv[])
                         ce_cht->Fill(ce_cht_val[ch] * Histograms::kNsPerBin, ch);
                     }
 
-                    if (isCal && !std::isnan(cc_amp_val[ch]) && !std::isnan(cc_cht_val[ch]))
+                    if (needsCalibration && !std::isnan(cc_amp_val[ch]) && !std::isnan(cc_cht_val[ch]))
                     {
                         double energy   = ccECalibrate[ch](ccGainMatch[ch](cc_amp_val[ch]));
                         double cht      = cc_cht_val[ch] * Histograms::kNsPerBin;
                         cc_xtal_E[xtal] = energy;
                         cc_xtal_T[xtal] = cht;
-                        cc_chE->Fill(energy, ch);
-                        cc_sum->Fill(energy, det);
+                        if (isCal)
+                        {
+                            cc_chE->Fill(energy, ch);
+                            cc_sum->Fill(energy, det);
+                        }
                     }
 
-                    if (isCal && !std::isnan(cb_amp_val[ch]) && !std::isnan(cb_cht_val[ch]))
+                    if (needsCalibration && !std::isnan(cb_amp_val[ch]) && !std::isnan(cb_cht_val[ch]))
                     {
                         double energy   = cbECalibrate[ch](cbGainMatch[ch](cb_amp_val[ch]));
                         double cht      = cb_cht_val[ch] * Histograms::kNsPerBin;
                         cb_xtal_E[xtal] = energy;
                         cb_xtal_T[xtal] = cht;
-                        cb_chE->Fill(energy, ch);
-                        cb_sum->Fill(energy, det);
+                        if (isCal)
+                        {
+                            cb_chE->Fill(energy, ch);
+                            cb_sum->Fill(energy, det);
+                        }
                     }
                 } // End Crystal Loop
 
                 // Clover Cross Add-Back
-                if (isCal && std::any_of(cc_xtal_E.begin(), cc_xtal_E.end(), [](double x) { return x > CAAddBack::kAddBackThreshold; }))
+                if (needsCalibration && std::any_of(cc_xtal_E.begin(), cc_xtal_E.end(), [](double x) { return x > CAAddBack::kAddBackThreshold; }))
                 {
                     if (isXtcorr)
                     {
@@ -350,11 +370,12 @@ int main(int argc, char* argv[])
                     }
                     auto energies_corr = xTalkCorrection[4 + det](cc_xtal_E);
                     auto ab_hit        = CAAddBack::GetAddBackHit(energies_corr, cc_xtal_T);
-                    cc_abE->Fill(ab_hit.first, det);
+                    hpgeHits.push_back(ab_hit);
+                    if (isCal) cc_abE->Fill(ab_hit.first, det);
                 }
 
                 // Clover Back Add-Back
-                if (isCal && std::any_of(cb_xtal_E.begin(), cb_xtal_E.end(), [](double x) { return x > CAAddBack::kAddBackThreshold; }))
+                if (needsCalibration && std::any_of(cb_xtal_E.begin(), cb_xtal_E.end(), [](double x) { return x > CAAddBack::kAddBackThreshold; }))
                 {
                     if (isXtcorr)
                     {
@@ -364,10 +385,31 @@ int main(int argc, char* argv[])
                     }
                     auto energies_corr = xTalkCorrection[det](cb_xtal_E);
                     auto ab_hit        = CAAddBack::GetAddBackHit(energies_corr, cb_xtal_T);
-                    cb_abE->Fill(ab_hit.first, det);
+                    hpgeHits.push_back(ab_hit);
+                    if (isCal) cb_abE->Fill(ab_hit.first, det);
                 }
 
             } // End Detector Loop
+
+            // Coincidence Analysis
+            if (isCoin)
+            {
+                // HPGe-HPGe Coincidence
+                for (size_t i = 0; i < hpgeHits.size(); i++)
+                {
+                    for (size_t j = i + 1; j < hpgeHits.size(); j++)
+                    {
+                        double energy1  = hpgeHits[i].first;
+                        double energy2  = hpgeHits[j].first;
+                        double timeDiff = hpgeHits[i].second - hpgeHits[j].second;
+
+                        gege_ggT->Fill(energy1, energy2, timeDiff);
+                        gege_ggT->Fill(energy2, energy1, timeDiff);
+                    }
+                }
+                gege_ggM->Fill(hpgeHits.size());
+                // printf("[DEBUG] Processed event with %zu HPGe hits\n", hpgeHits.size());
+            }
 
             processedEntries++;
         } // End Event Loop
@@ -417,7 +459,6 @@ int main(int argc, char* argv[])
             Histograms::c7_xtk[i]->Write();
         }
     }
-    outfile->cd();
 
     // Clover Back Histograms
     auto cb_dir = outfile->mkdir("clover_back");
@@ -447,7 +488,6 @@ int main(int argc, char* argv[])
             Histograms::b5_xtk[i]->Write();
         }
     }
-    outfile->cd();
 
     // CeBr Histograms
     auto ce_dir = outfile->mkdir("cebr_all");
@@ -461,6 +501,19 @@ int main(int argc, char* argv[])
         Histograms::ce_mdt->Write();
     }
     if (args.mode == "cal" || args.mode == "xtcorr") { Histograms::ce_chE->Write(); }
+
+    // Coincidence Histograms
+    if (args.mode == "coin")
+    {
+        auto coin_dir = outfile->mkdir("coin");
+        coin_dir->cd();
+        Histograms::gege_ggT->Write();
+        Histograms::gege_ggM->Write();
+        // Histograms::cege_ggT->Write();
+        // Histograms::cege_ggM->Write();
+        // Histograms::cece_ggT->Write();
+        // Histograms::cece_ggM->Write();
+    }
     outfile->cd();
 
     /* #endregion */

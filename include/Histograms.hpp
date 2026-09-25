@@ -10,6 +10,7 @@
 #include <ROOT/TThreadedObject.hxx>
 #include <TH1D.h>
 #include <TH2D.h>
+#include <TH3D.h>
 
 // Project Includes
 #include "CASort/TCAHistogram.hpp"
@@ -21,55 +22,72 @@ inline constexpr double       kMaxEnergy         = 10000.0;   // Maximum energy 
 inline constexpr double       kXTalkMaxEnergy    = 6000.0;    // Maximum energy for cross-talk histograms in keV
 inline constexpr double       kEnergyPerBin      = 0.50;      // Energy per bin in keV
 inline constexpr double       kXTalkEnergyPerBin = 5.0;       // Coarser binning for 2D cross-talk histograms
+inline constexpr double       kCoinEnergyPerBin  = 10.0;      // Energy per bin in coincidence histograms
+inline constexpr double       kCoinMaxTime       = 200.0;     // Maximum time for coincidence histograms in ns
+inline constexpr double       kCoinTimePerBin    = 5.0;       // Time in ns per bin in coincidence histograms
 inline constexpr double       kNsPerBin          = 0.098;     // Conversion factor from bin to nanoseconds
 inline constexpr unsigned int kDigitizerBins     = 1u << 16u; // Number of bins in the digitizer (16-bit)
 inline constexpr unsigned int kDigitizerChannels = 16u;       // Number of channels in digitizer
 
 // --- Raw histograms (mode == "raw") ---
 // Clover Cross
-inline std::unique_ptr<TCAHistogram<TH2D>> cc_amp;
-inline std::unique_ptr<TCAHistogram<TH2D>> cc_cht;
-// inline std::unique_ptr<TCAHistogram<TH2D>> cc_plu;
-inline std::unique_ptr<TCAHistogram<TH1D>> cc_mdt;
-// inline std::unique_ptr<TCAHistogram<TH2D>> cc_trt;
+inline std::unique_ptr<TCAHistogram<TH2D>> cc_amp; // Amplitude histogram for Clover Cross module
+inline std::unique_ptr<TCAHistogram<TH2D>> cc_cht; // Channel Time histogram for Clover Cross module
+// inline std::unique_ptr<TCAHistogram<TH2D>> cc_plu; // Pile-Up histogram for Clover Cross module
+inline std::unique_ptr<TCAHistogram<TH1D>> cc_mdt; // Module Time histogram for Clover Cross module
+// inline std::unique_ptr<TCAHistogram<TH2D>> cc_trt; // Trigger Time histogram for Clover Cross module
+
 //  Clover Back
-inline std::unique_ptr<TCAHistogram<TH2D>> cb_amp;
-inline std::unique_ptr<TCAHistogram<TH2D>> cb_cht;
-// inline std::unique_ptr<TCAHistogram<TH2D>> cb_plu;
-inline std::unique_ptr<TCAHistogram<TH1D>> cb_mdt;
-// inline std::unique_ptr<TCAHistogram<TH2D>> cb_trt;
+inline std::unique_ptr<TCAHistogram<TH2D>> cb_amp; // Amplitude histogram for Clover Back module
+inline std::unique_ptr<TCAHistogram<TH2D>> cb_cht; // Channel Time histogram for Clover Back module
+// inline std::unique_ptr<TCAHistogram<TH2D>> cb_plu; // Pile-Up histogram for Clover Back module
+inline std::unique_ptr<TCAHistogram<TH1D>> cb_mdt; // Module Time histogram for Clover Back module
+// inline std::unique_ptr<TCAHistogram<TH2D>> cb_trt; // Trigger Time histogram for Clover Back module
+
 //  CeBr Detectors
-inline std::unique_ptr<TCAHistogram<TH2D>> ce_inl;
-inline std::unique_ptr<TCAHistogram<TH2D>> ce_ins;
-inline std::unique_ptr<TCAHistogram<TH2D>> ce_cht;
-inline std::unique_ptr<TCAHistogram<TH1D>> ce_mdt;
-// inline std::unique_ptr<TCAHistogram<TH2D>> ce_trt;
+inline std::unique_ptr<TCAHistogram<TH2D>> ce_inl; // Integration Long histogram for CeBr detectors
+inline std::unique_ptr<TCAHistogram<TH2D>> ce_ins; // Integration Short histogram for CeBr detectors
+inline std::unique_ptr<TCAHistogram<TH2D>> ce_cht; // Channel Time histogram for CeBr detectors
+inline std::unique_ptr<TCAHistogram<TH1D>> ce_mdt; // Module Time histogram for CeBr detectors
+// inline std::unique_ptr<TCAHistogram<TH2D>> ce_trt; // Trigger Time histogram for CeBr detectors
 
 // --- Calibrated histograms (mode == "cal" or "xtcorr") ---
 // Clover Cross
-inline std::unique_ptr<TCAHistogram<TH2D>> cc_chE;
-inline std::unique_ptr<TCAHistogram<TH2D>> cc_sum;
-inline std::unique_ptr<TCAHistogram<TH2D>> cc_abE;
+inline std::unique_ptr<TCAHistogram<TH2D>> cc_chE; // Channel Energy histogram for Clover Cross module
+inline std::unique_ptr<TCAHistogram<TH2D>> cc_sum; // Sum Energy histogram for detectors in the Clover Cross module
+inline std::unique_ptr<TCAHistogram<TH2D>> cc_abE; // Add-back Energy histogram for detectorsClover Cross module
+
 // Clover Back
-inline std::unique_ptr<TCAHistogram<TH2D>> cb_chE;
-inline std::unique_ptr<TCAHistogram<TH2D>> cb_sum;
-inline std::unique_ptr<TCAHistogram<TH2D>> cb_abE;
+inline std::unique_ptr<TCAHistogram<TH2D>> cb_chE; // Channel Energy histogram for Clover Back module
+inline std::unique_ptr<TCAHistogram<TH2D>> cb_sum; // Sum Energy histogram for detectors in the Clover Back module
+inline std::unique_ptr<TCAHistogram<TH2D>> cb_abE; // Add-back Energy histogram for detectors in the Clover Back module
+
 // CeBr Detectors
-inline std::unique_ptr<TCAHistogram<TH2D>> ce_chE;
+inline std::unique_ptr<TCAHistogram<TH2D>> ce_chE; // Channel Energy histogram for CeBr detectors
 
 // --- Cross-talk correction histograms (mode == "xtcorr") ---
 // Clover Cross
-inline std::unique_ptr<TCAHistogram<TH1D>>                cc_abM;
-inline std::array<std::unique_ptr<TCAHistogram<TH2D>>, 6> c1_xtk;
-inline std::array<std::unique_ptr<TCAHistogram<TH2D>>, 6> c3_xtk;
-inline std::array<std::unique_ptr<TCAHistogram<TH2D>>, 6> c5_xtk;
-inline std::array<std::unique_ptr<TCAHistogram<TH2D>>, 6> c7_xtk;
+inline std::unique_ptr<TCAHistogram<TH1D>>                cc_abM; // Add-back Multiplicity histogram for detectors in the Clover Cross module
+inline std::array<std::unique_ptr<TCAHistogram<TH2D>>, 6> c1_xtk; // Cross-talk correction histograms for C1
+inline std::array<std::unique_ptr<TCAHistogram<TH2D>>, 6> c3_xtk; // Cross-talk correction histograms for C3
+inline std::array<std::unique_ptr<TCAHistogram<TH2D>>, 6> c5_xtk; // Cross-talk correction histograms for C5
+inline std::array<std::unique_ptr<TCAHistogram<TH2D>>, 6> c7_xtk; // Cross-talk correction histograms for C7
 // Clover Back
-inline std::unique_ptr<TCAHistogram<TH1D>>                cb_abM;
-inline std::array<std::unique_ptr<TCAHistogram<TH2D>>, 6> b1_xtk;
-inline std::array<std::unique_ptr<TCAHistogram<TH2D>>, 6> b2_xtk;
-inline std::array<std::unique_ptr<TCAHistogram<TH2D>>, 6> b3_xtk;
-inline std::array<std::unique_ptr<TCAHistogram<TH2D>>, 6> b5_xtk;
+inline std::unique_ptr<TCAHistogram<TH1D>>                cb_abM; // Add-back Multiplicity histogram for detectors in the Clover Back module
+inline std::array<std::unique_ptr<TCAHistogram<TH2D>>, 6> b1_xtk; // Cross-talk correction histograms for B1
+inline std::array<std::unique_ptr<TCAHistogram<TH2D>>, 6> b2_xtk; // Cross-talk correction histograms for B2
+inline std::array<std::unique_ptr<TCAHistogram<TH2D>>, 6> b3_xtk; // Cross-talk correction histograms for B3
+inline std::array<std::unique_ptr<TCAHistogram<TH2D>>, 6> b5_xtk; // Cross-talk correction histograms for B5
+
+// --- Coincidence histograms (mode == "coin") ---
+inline std::unique_ptr<TCAHistogram<TH3I>> gege_ggT; // HPGe-HPGe Coincidence histogram (any HPGe in coincidence with any other HPGe)
+inline std::unique_ptr<TCAHistogram<TH1I>> gege_ggM; // HPGe-HPGe Coincidence Multiplicity histogram (any HPGe in coincidence with any other HPGe)
+
+inline std::unique_ptr<TCAHistogram<TH3I>> cege_ggT; // CeBr-HPGe Coincidence histogram (any CeBr in coincidence with any HPGe)
+inline std::unique_ptr<TCAHistogram<TH1I>> cege_ggM; // CeBr-HPGe Coincidence Multiplicity histogram (any CeBr in coincidence with any HPGe)
+
+inline std::unique_ptr<TCAHistogram<TH3I>> cece_ggT; // CeBr-CeBr Coincidence histogram (any CeBr in coincidence with any other CeBr)
+inline std::unique_ptr<TCAHistogram<TH1I>> cece_ggM; // CeBr-CeBr Coincidence Multiplicity histogram (any CeBr in coincidence with any other CeBr)
 
 inline void Initialize(const std::string& mode)
 {
@@ -230,6 +248,19 @@ inline void Initialize(const std::string& mode)
                                                        kXTalkMaxEnergy),
                   std::make_unique<TCAHistogram<TH2D>>("B5_xtk_E3E4", "B5 Cross-Talk E3 by E4;E3;E4", kXTalkMaxEnergy / kXTalkEnergyPerBin, 0, kXTalkMaxEnergy, kXTalkMaxEnergy / kXTalkEnergyPerBin, 0,
                                                        kXTalkMaxEnergy)};
+    } else if (mode == "coin")
+    {
+        gege_ggT = std::make_unique<TCAHistogram<TH3I>>("gege_ggT", "HPGe-HPGe Coincidence;Energy (keV);Energy (keV);Time (ns);Counts/Bin", kMaxEnergy / kCoinEnergyPerBin, 0, kMaxEnergy,
+                                                        kMaxEnergy / kCoinEnergyPerBin, 0, kMaxEnergy, 2 * kCoinMaxTime / kCoinTimePerBin, -kCoinMaxTime, kCoinMaxTime);
+        gege_ggM = std::make_unique<TCAHistogram<TH1I>>("gege_ggM", "HPGe-HPGe Coincidence Multiplicity;Multiplicity;Counts", 10, 0.5, 10.5);
+
+        cege_ggT = std::make_unique<TCAHistogram<TH3I>>("cege_ggT", "CeBr-CeBr Coincidence;Energy (keV);Energy (keV);Counts/Bin", kMaxEnergy / kCoinEnergyPerBin, 0, kMaxEnergy,
+                                                        kMaxEnergy / kCoinEnergyPerBin, 0, kMaxEnergy, 2 * kCoinMaxTime / kCoinTimePerBin, -kCoinMaxTime, kCoinMaxTime);
+        cege_ggM = std::make_unique<TCAHistogram<TH1I>>("cege_ggM", "CeBr-HPGe Coincidence Multiplicity;Multiplicity;Counts", 10, 0.5, 10.5);
+
+        cece_ggT = std::make_unique<TCAHistogram<TH3I>>("cece_ggT", "CeBr-HPGe Coincidence;Energy (keV);Energy (keV);Counts/Bin", kMaxEnergy / kCoinEnergyPerBin, 0, kMaxEnergy,
+                                                        kMaxEnergy / kCoinEnergyPerBin, 0, kMaxEnergy, 2 * kCoinMaxTime / kCoinTimePerBin, -kCoinMaxTime, kCoinMaxTime);
+        cece_ggM = std::make_unique<TCAHistogram<TH1I>>("cece_ggM", "CeBr-CeBr Coincidence Multiplicity;Multiplicity;Counts", 10, 0.5, 10.5);
     }
 }
 } // namespace Histograms
